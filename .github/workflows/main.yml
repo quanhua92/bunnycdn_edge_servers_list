@@ -1,0 +1,24 @@
+name: "Check new servers every day"
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Check
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install jq
+        uses: sudo apt-get install -y jq
+      - name: Run check servers
+        run: sh check_ips.sh
+      - name: Commit changes
+        uses: elstudio/actions-js-build/commit@v3
+        with:
+          commitMessage: Automated snapshot
