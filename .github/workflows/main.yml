@@ -13,7 +13,7 @@ jobs:
     name: Check
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Install jq
         run: sudo apt-get install -y jq
       - name: Run check servers
