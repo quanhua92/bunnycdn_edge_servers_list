@@ -12,13 +12,31 @@ jobs:
     runs-on: ubuntu-latest
     name: Check
     timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@main
       - name: Install jq
         run: sudo apt-get install -y jq
       - name: Run check servers
         run: sh check_ips.sh
-      - name: Commit changes
-        uses: elstudio/actions-js-build/commit@v3
-        with:
-          commitMessage: Automated snapshot
+      - name: Commit and push changes
+        run: |
+          # Configure git with the details of the last commit's author to keep authorship consistent.
+          git config user.name "$(git log -n 1 --pretty=format:%an)"
+          git config user.email "$(git log -n 1 --pretty=format:%ae)"
+
+          # Add all new/changed files to the staging area.
+          git add .
+
+          # Check if there are any changes to commit. If not, exit successfully.
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit. Exiting."
+            exit 0
+          fi
+
+          # Create a new commit with the updated data
+          git commit -m "Automated snapshot"
+
+          # Push the changes to the repository
+          git push
